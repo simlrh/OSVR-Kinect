@@ -1,0 +1,168 @@
+{
+	"deviceVendor": "Microsoft",
+	"deviceName": "Kinect for Xbox ONE",
+	"author": "Steve Le Roy Harris <steve@nourish.je>",
+	"version": 1,
+	"lastModified": "2016-06023T21:13:07.585Z",
+	"interfaces": {
+		"tracker": {
+			"count": 25,
+			"position": true,
+			"orientation": true
+		},
+		"analog": {
+			"count": 25,
+			 "traits": [
+				 {
+					"min": 0,
+					"max": 1,
+					"rest": 0
+				}
+			]
+		},
+		"button": {
+			"count": 6
+		}
+	},
+	"semantic": {
+		"body1": {
+			"torso": {
+				"hips": {
+					"$target": "tracker/0",				// SpineBase
+					"confidence": "analog/0"
+				},
+				"spine": {
+					"$target": "tracker/1",				// SpineMid
+					"confidence": "analog/1"
+				},
+				"chest": {
+					"$target": "tracker/20",			// SpineShoulder
+					"confidence": "analog/20"
+				}
+			},
+			"head": {
+				"neck": {
+					"$target": "tracker/2",				// Neck
+					"confidence": "analog/2"
+				},
+				"$target": "tracker/3",					// Head
+				"confidence": "analog/3"
+			},		
+			"arms": {
+				"right": {
+					"shoulder": {
+						"$target": "tracker/8",			// ShoulderRight
+						"confidence": "analog/8"
+					},
+					"elbow": {
+						"$target": "tracker/9",			// ElbowRight
+						"confidence": "analog/9"
+					},
+					"wrist": {
+						"$target": "tracker/10",		// WristRight
+						"confidence": "analog/10"
+					},
+					"hand": {
+						"$target": "tracker/11",		// HandRight
+						"confidence": "analog/11",
+						"tip": {
+							"$target": "tracker/23",	// HandTipRight
+							"confidence": "analog/23"
+						},
+						"thumb": {
+							"$target": "tracker/24",	// ThumbRight
+							"confidence": "analog/24"
+						},
+						"open": "button/0",
+						"closed": "button/1",
+						"lassoo": "button/2" 
+					}
+				},
+				"left": {
+					"shoulder": {
+						"$target": "tracker/4",			// ShoulderLeft
+						"confidence": "analog/4"
+					},
+					"elbow": {
+						"$target": "tracker/5",			// ElbowLeft
+						"confidence": "analog/5"
+					},
+					"wrist": {
+						"$target": "tracker/6",			// WristLeft
+						"confidence": "analog/6"
+					},
+					"hand": {
+						"$target": "tracker/7",			// HandLeft
+						"confidence": "analog/7",
+						"tip": {
+							"$target": "tracker/21",	// HandTipLeft
+							"confidence": "analog/21"
+						},
+						"thumb": {
+							"$target": "tracker/22",	// ThumbLeft
+							"confidence": "analog/22"
+						},
+						"open": "button/3",
+						"closed": "button/4",
+						"lassoo": "button/5" 
+					}
+				}
+			},
+			"legs": {
+				"left": {
+					"hip": {
+						"$target": "tracker/12",		// HipLeft
+						"confidence": "analog/12"
+					},
+					"knee": {
+						"$target": "tracker/13",		// KneeLeft
+						"confidence": "analog/13"
+					},
+					"ankle": {
+						"$target": "tracker/14",		// AnkleLeft
+						"confidence": "analog/14"
+					},
+					"foot": {
+						"$target": "tracker/15",		// FootLeft
+						"confidence": "analog/15"
+					}
+				},
+				"right": {
+					"hip": {
+						"$target": "tracker/16",		// HipRight
+						"confidence": "analog/16"
+					},
+					"knee": {
+						"$target": "tracker/17",		// KneeRight
+						"confidence": "analog/17"
+					},
+					"ankle": {
+						"$target": "tracker/18",		// AnkleRight
+						"confidence": "analog/18"
+					},
+					"foot": {
+						"$target": "tracker/19",		// FootRight
+						"confidence": "analog/19"
+					}
+				}
+			}
+		}
+	},
+   	"automaticAliases": { 
+		"/me/head": "semantic/body1/head",
+		"/me/hands/left": "semantic/body1/arms/left/hand", 
+		"/me/hands/right": "semantic/body1/arms/right/hand", 
+
+		"/controller/right/1": "semantic/body1/arms/right/hand/open",
+		"/controller/right/2": "semantic/body1/arms/right/hand/closed",
+		"/controller/right/3": "semantic/body1/arms/right/hand/lasso",
+		"/controller/left/1": "semantic/body1/arms/left/hand/open",
+		"/controller/left/2": "semantic/body1/arms/left/hand/closed",
+		"/controller/left/3": "semantic/body1/arms/left/hand/lasso",
+
+		"/me/torso": "semantic/body1/torso/*",
+ 		"/me/arms": "semantic/body1/arms/*",
+		"/me/legs": "semantic/body1/legs/*",
+		"/me/neck": "semantic/body1/head/neck"
+	} 
+}
