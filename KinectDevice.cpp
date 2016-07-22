@@ -48,7 +48,7 @@ namespace KinectOsvr {
 		OSVR_DeviceInitOptions opts = osvrDeviceCreateInitOptions(ctx);
 
 		osvrDeviceTrackerConfigure(opts, &m_tracker);
-		osvrDeviceAnalogConfigure(opts, &m_analog, 25);
+		osvrDeviceAnalogConfigure(opts, &m_analog, 26);
 		osvrDeviceButtonConfigure(opts, &m_button, 6);
 
 		/// Create the device token with the options
@@ -191,7 +191,16 @@ namespace KinectOsvr {
 								m_firstUpdate = false;
 
 								setupOffset(&m_offset, &joints[JointType_Head], &jointOrientations[JointType_Neck]);
+								
+								osvrVec3SetX(&(m_kinectPose.translation), -joints[JointType_Head].Position.X);
+								osvrVec3SetY(&(m_kinectPose.translation), -joints[JointType_Head].Position.Y);
+								osvrVec3SetZ(&(m_kinectPose.translation), -joints[JointType_Head].Position.Z);
+								
+								Eigen::Quaterniond quaternion(Eigen::AngleAxisd(0, Eigen::Vector3d::UnitY()));
+								osvr::util::toQuat(quaternion, m_kinectPose.rotation);
 							}
+
+							osvrDeviceTrackerSendPose(m_dev, m_tracker, &m_kinectPose, 25);
 
 							for (int j = 0; j < _countof(joints); ++j)
 							{

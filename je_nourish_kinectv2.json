@@ -6,7 +6,7 @@
 	"lastModified": "2016-06023T21:13:07.585Z",
 	"interfaces": {
 		"tracker": {
-			"count": 25,
+			"count": 26,
 			"position": true,
 			"orientation": true
 		},
@@ -25,6 +25,7 @@
 		}
 	},
 	"semantic": {
+		"kinect": "tracker/25",
 		"body1": {
 			"torso": {
 				"hips": {

@@ -32,6 +32,7 @@ namespace KinectOsvr {
 
 		bool m_firstUpdate = true;
 		OSVR_PoseState m_offset;
+		OSVR_PoseState m_kinectPose;
 	};
 }
 
