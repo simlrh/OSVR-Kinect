@@ -1,9 +1,9 @@
-# OSVR-KinectV2
+# OSVR-Kinect
 
-An OSVR plugin providing Kinect SDK v2 position and orientation joint tracking, for use with a Kinect for Xbox One.
+An OSVR plugin providing Kinect SDK position and orientation joint tracking, for use with a Kinect for Xbox One, or Kinect for Xbox 360.
 
-git clone https://github.com/simlrh/OSVR-KinectV2
-cd OSVR-KinectV2
+git clone https://github.com/simlrh/OSVR-Kinect
+cd OSVR-Kinect
 git submodule init
 git submodule update
 

@@ -1,0 +1,132 @@
+{
+	"deviceVendor": "Microsoft",
+	"deviceName": "Kinect for Windows",
+	"author": "Steve Le Roy Harris <steve@nourish.je>",
+	"version": 1,
+	"lastModified": "2016-06023T21:13:07.585Z",
+	"interfaces": {
+		"tracker": {
+			"count": 21,
+			"position": true,
+			"orientation": true
+		},
+		"analog": {
+			"count": 20,
+			 "traits": [
+				 {
+					"min": 0,
+					"max": 1,
+					"rest": 0
+				}
+			]
+		}
+	},
+	"semantic": {
+		"kinect": "tracker/20",
+		"body1": {
+			"torso": {
+				"hips": {
+					"$target": "tracker/0",				// NUI_SKELETON_POSITION_HIP_CENTER
+					"confidence": "analog/0"
+				},
+				"spine": {
+					"$target": "tracker/1",				// NUI_SKELETON_POSITION_SPINE
+					"confidence": "analog/1"
+				},
+				"chest": {
+					"$target": "tracker/2",				// NUI_SKELETON_POSITION_SHOULDER_CENTER
+					"confidence": "analog/2"
+				}
+			},
+			"head": {
+				"$target": "tracker/3",					// NUI_SKELETON_POSITION_HEAD
+				"confidence": "analog/3"
+			},		
+			"arms": {
+				"left": {
+					"shoulder": {
+						"$target": "tracker/4",			// NUI_SKELETON_POSITION_SHOULDER_LEFT
+						"confidence": "analog/4"
+					},
+					"elbow": {
+						"$target": "tracker/5",			// NUI_SKELETON_POSITION_ELBOW_LEFT
+						"confidence": "analog/5"
+					},
+					"wrist": {
+						"$target": "tracker/6",			// NUI_SKELETON_POSITION_WRIST_LEFT
+						"confidence": "analog/6"
+					},
+					"hand": {
+						"$target": "tracker/7",			// NUI_SKELETON_POSITION_HAND_LEFT
+						"confidence": "analog/7"
+					}
+				},
+				"right": {
+					"shoulder": {
+						"$target": "tracker/8",			// NUI_SKELETON_POSITION_SHOULDER_RIGHT
+						"confidence": "analog/8"
+					},
+					"elbow": {
+						"$target": "tracker/9",			//  NUI_SKELETON_POSITION_ELBOW_RIGHT
+						"confidence": "analog/9"
+					},
+					"wrist": {
+						"$target": "tracker/10",		// NUI_SKELETON_POSITION_WRIST_RIGHT
+						"confidence": "analog/10"
+					},
+					"hand": {
+						"$target": "tracker/11",		// NUI_SKELETON_POSITION_HAND_RIGHT
+						"confidence": "analog/11"
+					}
+				}
+			},
+			"legs": {
+				"left": {
+					"hip": {
+						"$target": "tracker/12",		// NUI_SKELETON_POSITION_HIP_LEFT
+						"confidence": "analog/12"
+					},
+					"knee": {
+						"$target": "tracker/13",		// NUI_SKELETON_POSITION_KNEE_LEFT
+						"confidence": "analog/13"
+					},
+					"ankle": {
+						"$target": "tracker/14",		// NUI_SKELETON_POSITION_ANKLE_LEFT
+						"confidence": "analog/14"
+					},
+					"foot": {
+						"$target": "tracker/15",		// NUI_SKELETON_POSITION_FOOT_LEFT
+						"confidence": "analog/15"
+					}
+				},
+				"right": {
+					"hip": {
+						"$target": "tracker/16",		// NUI_SKELETON_POSITION_HIP_RIGHT
+						"confidence": "analog/16"
+					},
+					"knee": {
+						"$target": "tracker/17",		// NUI_SKELETON_POSITION_KNEE_RIGHT
+						"confidence": "analog/17"
+					},
+					"ankle": {
+						"$target": "tracker/18",		// NUI_SKELETON_POSITION_ANKLE_RIGHT
+						"confidence": "analog/18"
+					},
+					"foot": {
+						"$target": "tracker/19",		// NUI_SKELETON_POSITION_FOOT_RIGHT
+						"confidence": "analog/19"
+					}
+				}
+			}
+		}
+	},
+   	"automaticAliases": { 
+		"/me/head": "semantic/body1/head",
+		"/me/hands/left": "semantic/body1/arms/left/hand", 
+		"/me/hands/right": "semantic/body1/arms/right/hand", 
+
+		"/me/torso": "semantic/body1/torso/*",
+ 		"/me/arms": "semantic/body1/arms/*",
+		"/me/legs": "semantic/body1/legs/*"
+	} 
+}
