@@ -9,7 +9,7 @@ namespace KinectOsvr {
 		OSVR_ReturnCode update();
 		static bool Detect(IKinectSensor** ppKinectSensor);
 	private:
-		void ProcessBody(IBody** ppBodies);
+		void ProcessBody(IBody** ppBodies, OSVR_TimeValue* timeValue);
 		int addBody(int idx);
 		void removeBody(int idx);
 		bool firstBody(int channel);
@@ -28,5 +28,8 @@ namespace KinectOsvr {
 		bool m_firstUpdate = true;
 		OSVR_PoseState m_offset;
 		OSVR_PoseState m_kinectPose;
+
+		OSVR_TimeValue m_initializeTime;
+		INT64 m_initializeOffset = 0;
 	};
 }

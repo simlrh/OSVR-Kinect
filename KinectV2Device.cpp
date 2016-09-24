@@ -1,5 +1,6 @@
 #include "KinectV2Device.h"
 #include "KinectMath.h"
+#include <iostream>
 
 // Generated JSON header file
 #include "je_nourish_kinectv2_json.h"
@@ -19,9 +20,13 @@ namespace KinectOsvr {
 
 		hr = m_pKinectSensor->Open();
 
+
 		if (SUCCEEDED(hr))
 		{
 			hr = m_pKinectSensor->get_CoordinateMapper(&m_pCoordinateMapper);
+		}
+		else {
+			std::cout << "Failed to open sensor" << std::endl;
 		}
 		if (SUCCEEDED(hr))
 		{
@@ -68,6 +73,17 @@ namespace KinectOsvr {
 
 			hr = pBodyFrame->get_RelativeTime(&nTime);
 
+			if (m_initializeOffset == 0) {
+				osvrTimeValueGetNow(&m_initializeTime);
+				m_initializeOffset = nTime;
+			}
+			nTime = (nTime - m_initializeOffset) / 10;
+
+			OSVR_TimeValue timeValue;
+			timeValue.seconds = nTime / 1000000;
+			timeValue.microseconds = nTime % 1000000;
+			osvrTimeValueSum(&timeValue, &m_initializeTime);
+
 			IBody* ppBodies[BODY_COUNT] = { 0 };
 
 			if (SUCCEEDED(hr))
@@ -77,7 +93,7 @@ namespace KinectOsvr {
 
 			if (SUCCEEDED(hr))
 			{
-				ProcessBody(ppBodies);
+				ProcessBody(ppBodies, &timeValue);
 			}
 
 			for (int i = 0; i < _countof(ppBodies); ++i)
@@ -105,7 +121,7 @@ namespace KinectOsvr {
 		osvr::util::toQuat(q.inverse(), offset->rotation);
 	}
 
-	void KinectV2Device::ProcessBody(IBody** ppBodies) {
+	void KinectV2Device::ProcessBody(IBody** ppBodies, OSVR_TimeValue* timeValue) {
 
 		if (m_pCoordinateMapper)
 		{
@@ -169,7 +185,7 @@ namespace KinectOsvr {
 								osvr::util::toQuat(quaternion, m_kinectPose.rotation);
 							}
 
-							osvrDeviceTrackerSendPose(m_dev, m_tracker, &m_kinectPose, 25);
+							osvrDeviceTrackerSendPoseTimestamped(m_dev, m_tracker, &m_kinectPose, 25, timeValue);
 
 							for (int j = 0; j < _countof(joints); ++j)
 							{
@@ -191,7 +207,7 @@ namespace KinectOsvr {
 								poseState.rotation = rotation;
 								applyOffset(&m_offset, &poseState);
 								// Send pose
-								osvrDeviceTrackerSendPose(m_dev, m_tracker, &poseState, j);
+								osvrDeviceTrackerSendPoseTimestamped(m_dev, m_tracker, &poseState, j, timeValue);
 
 								OSVR_AnalogState confidence = 0;
 								switch (joints[j].TrackingState) {
@@ -207,7 +223,7 @@ namespace KinectOsvr {
 									break;
 								}
 								// Tracking confidence for use in smoothing plugins
-								osvrDeviceAnalogSetValue(m_dev, m_analog, confidence, j);
+								osvrDeviceAnalogSetValueTimestamped(m_dev, m_analog, confidence, j, timeValue);
 							}
 						}
 					}
@@ -250,9 +266,24 @@ namespace KinectOsvr {
 
 	bool KinectV2Device::Detect(IKinectSensor** ppKinectSensor) {
 
-		HRESULT hr = GetDefaultKinectSensor(ppKinectSensor);
+		typedef HRESULT(_stdcall *GetDefaultKinectSensorType)(IKinectSensor**);
+		GetDefaultKinectSensorType GetDefaultKinectSensor;
 
-		return SUCCEEDED(hr);
+		HINSTANCE hinstLib = LoadLibrary(TEXT("Kinect20.dll"));
+		if (hinstLib != NULL)
+		{
+			GetDefaultKinectSensor = (GetDefaultKinectSensorType)GetProcAddress(hinstLib, "GetDefaultKinectSensor");
+
+			// If the function address is valid, call the function.
+
+			if (GetDefaultKinectSensor != NULL)
+			{
+				HRESULT hr = GetDefaultKinectSensor(ppKinectSensor);
+				return SUCCEEDED(hr);
+			}
+		}
+
+		return false;
 
 	};
 

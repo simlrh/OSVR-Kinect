@@ -8,7 +8,6 @@ find_package( KinectSDK REQUIRED )
 find_package( KinectSDK2 REQUIRED )
 
 include_directories( ${KinectSDK_INCLUDE_DIRS} ${KinectSDK2_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR} )
-link_directories( ${KinectSDK_LIBRARY_DIRS} ${KinectSDK2_LIBRARY_DIRS} )
 
 osvr_convert_json(je_nourish_kinectv1_json
     je_nourish_kinectv1.json
@@ -33,5 +32,3 @@ osvr_add_plugin(NAME je_nourish_kinect
 	KinectV2Device.h
 	"${CMAKE_CURRENT_BINARY_DIR}/je_nourish_kinectv1_json.h"
     "${CMAKE_CURRENT_BINARY_DIR}/je_nourish_kinectv2_json.h")
-
-target_link_libraries( je_nourish_kinect ${KinectSDK_LIBRARIES} ${KinectSDK2_LIBRARIES} )

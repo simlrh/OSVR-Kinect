@@ -8,6 +8,14 @@
 
 namespace KinectOsvr {
 
+	typedef HRESULT(_stdcall *NuiGetSensorCountType)(int*);
+	typedef HRESULT(_stdcall *NuiCreateSensorByIndexType)(int, INuiSensor**);
+	typedef HRESULT(_stdcall *NuiSkeletonCalculateBoneOrientationsType)(NUI_SKELETON_DATA*, NUI_SKELETON_BONE_ORIENTATION*);
+
+	NuiGetSensorCountType NuiGetSensorCount;
+	NuiCreateSensorByIndexType NuiCreateSensorByIndex;
+	NuiSkeletonCalculateBoneOrientationsType NuiSkeletonCalculateBoneOrientations;
+
 	KinectV1Device::KinectV1Device(OSVR_PluginRegContext ctx, INuiSensor* pNuiSensor) : m_pNuiSensor(pNuiSensor) {
 
 		for (int i = 0; i < NUI_SKELETON_COUNT; i++) {
@@ -18,6 +26,7 @@ namespace KinectOsvr {
 
 		// Initialize the Kinect and specify that we'll be using skeleton
 		hr = m_pNuiSensor->NuiInitialize(NUI_INITIALIZE_FLAG_USES_SKELETON);
+
 		if (SUCCEEDED(hr))
 		{
 			// Create an event that will be signaled when skeleton data is available
@@ -82,6 +91,18 @@ namespace KinectOsvr {
 
 	void KinectV1Device::ProcessBody(NUI_SKELETON_FRAME* pSkeletons) {
 
+		LONGLONG timestamp = pSkeletons->liTimeStamp.QuadPart;
+		if (m_initializeOffset == 0) {
+			osvrTimeValueGetNow(&m_initializeTime);
+			m_initializeOffset = timestamp;
+		}
+		timestamp = timestamp - m_initializeOffset;
+
+		OSVR_TimeValue timeValue;
+		timeValue.seconds = timestamp /  1000;
+		timeValue.microseconds = (timestamp % 1000) * 1000;
+		osvrTimeValueSum(&timeValue, &m_initializeTime);
+
 		for (int i = 0; i < NUI_SKELETON_COUNT; ++i)
 		{
 			NUI_SKELETON_DATA skeleton = pSkeletons->SkeletonData[i];
@@ -119,7 +140,7 @@ namespace KinectOsvr {
 							osvr::util::toQuat(quaternion, m_kinectPose.rotation);
 						}
 
-						osvrDeviceTrackerSendPose(m_dev, m_tracker, &m_kinectPose, 21);
+						osvrDeviceTrackerSendPoseTimestamped(m_dev, m_tracker, &m_kinectPose, 21, &timeValue);
 
 						for (int j = 0; j < NUI_SKELETON_POSITION_COUNT; ++j)
 						{
@@ -143,7 +164,7 @@ namespace KinectOsvr {
 							poseState.rotation = rotation;
 							applyOffset(&m_offset, &poseState);
 							// Send pose
-							osvrDeviceTrackerSendPose(m_dev, m_tracker, &poseState, j);
+							osvrDeviceTrackerSendPoseTimestamped(m_dev, m_tracker, &poseState, j, &timeValue);
 
 							OSVR_AnalogState confidence = 0;
 							switch (skeleton.eSkeletonPositionTrackingState[j]) {
@@ -159,7 +180,7 @@ namespace KinectOsvr {
 								break;
 							}
 							// Tracking confidence for use in smoothing plugins
-							osvrDeviceAnalogSetValue(m_dev, m_analog, confidence, j);
+							osvrDeviceAnalogSetValueTimestamped(m_dev, m_analog, confidence, j, &timeValue);
 						}
 					}
 				}
@@ -203,6 +224,17 @@ namespace KinectOsvr {
 	}
 
 	bool KinectV1Device::Detect(INuiSensor** ppNuiSensor) {
+
+
+		HINSTANCE hinstLib = LoadLibrary(TEXT("Kinect10.dll"));
+		if (hinstLib == NULL) return false;
+
+		NuiGetSensorCount = (NuiGetSensorCountType)GetProcAddress(hinstLib, "NuiGetSensorCount");
+		NuiCreateSensorByIndex = (NuiCreateSensorByIndexType)GetProcAddress(hinstLib, "NuiCreateSensorByIndex");
+		NuiSkeletonCalculateBoneOrientations = (NuiSkeletonCalculateBoneOrientationsType)GetProcAddress(hinstLib, "NuiSkeletonCalculateBoneOrientations");
+
+		if (NuiGetSensorCount == NULL || NuiCreateSensorByIndex == NULL || NuiSkeletonCalculateBoneOrientations == NULL) return false;
+
 		int iSensorCount = 0;
 		HRESULT hr = NuiGetSensorCount(&iSensorCount);
 
