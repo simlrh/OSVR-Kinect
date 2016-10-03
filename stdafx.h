@@ -9,6 +9,15 @@
 #include <Kinect.h>
 #include <NuiApi.h>
 
+#include <thread>
+#include <mutex>
+#include <map>
+
+#include <Windows.h>
+#include <windowsx.h>
+#include <tchar.h>
+#include "resource.h"
+
 #define _USE_MATH_DEFINES
 #include <Math.h>
 
