@@ -23,6 +23,8 @@ osvr_add_plugin(NAME je_nourish_kinect
     CPP
     SOURCES
 	stdafx.h
+	resource.h
+	je_nourish_kinect.rc
 	je_nourish_kinect.cpp
 	KinectMath.cpp
 	KinectMath.h
