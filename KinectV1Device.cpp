@@ -10,7 +10,6 @@ namespace KinectOsvr {
 
 	std::map<HWND, KinectV1Device*> windowMap;
 
-
 	typedef HRESULT(_stdcall *NuiGetSensorCountType)(int*);
 	typedef HRESULT(_stdcall *NuiCreateSensorByIndexType)(int, INuiSensor**);
 	typedef HRESULT(_stdcall *NuiSkeletonCalculateBoneOrientationsType)(NUI_SKELETON_DATA*, NUI_SKELETON_BONE_ORIENTATION*);
@@ -98,6 +97,11 @@ namespace KinectOsvr {
 		m_trackedBodyChanged = true;
 	}
 
+	void KinectV1Device::recenter()
+	{
+		m_firstUpdate = true;
+	}
+
 	void KinectV1Device::ui_thread(ui_thread_data& data)
 	{
 		MSG msg;
@@ -129,15 +133,18 @@ namespace KinectOsvr {
 			}
 
 			bool redraw = false;
+			bool foundBody = false;
 			int bodies = 0;
 
 			for (int i = 0; i < NUI_SKELETON_COUNT; i++) {
+				if (bodyStates[i] == ShouldBeTracked) {
+					foundBody = true;
+				}
 				if (bodyStates[i] != CannotBeTracked) {
 					bodies++;
 				}
 				if (bodyStates[i] != previousStates[i]) {
 					redraw = true;
-					SendDlgItemMessage(hDlg, IDC_RADIO1 + i, WM_ENABLE, true, 0);
 					EnableWindow(GetDlgItem(hDlg, IDC_RADIO1 + i), bodyStates[i] != CannotBeTracked);
 					if (bodyStates[i] == ShouldBeTracked) {
 						CheckRadioButton(hDlg, IDC_RADIO1, IDC_RADIO6, IDC_RADIO1 + i);
@@ -146,6 +153,9 @@ namespace KinectOsvr {
 				}
 			}
 			if (redraw) {
+				if (!foundBody) {
+					CheckRadioButton(hDlg, IDC_RADIO1, IDC_RADIO6, 0);
+				}
 				if (bodies == 1) {
 					SetDlgItemText(hDlg, IDC_STATIC1, "1 body detected.");
 				}
@@ -169,6 +179,9 @@ namespace KinectOsvr {
 		case WM_COMMAND:
 			switch (LOWORD(wParam))
 			{
+			case IDC_BUTTON1:
+				windowMap[hDlg]->recenter();
+				break;
 			case IDC_CHECK1:
 				if (BN_CLICKED == HIWORD(wParam)) {
 					windowMap[hDlg]->toggleSeatedMode();
@@ -473,12 +486,17 @@ namespace KinectOsvr {
 	};
 
 	KinectV1Device::~KinectV1Device() {
-
 		if (m_pNuiSensor)
 		{
 			m_pNuiSensor->NuiShutdown();
+			m_pNuiSensor->Release();
+			m_pNuiSensor = NULL;
 		}
-		SafeRelease(m_pNuiSensor);
+
+		if (m_hNextSkeletonEvent && (m_hNextSkeletonEvent != INVALID_HANDLE_VALUE))
+		{
+			CloseHandle(m_hNextSkeletonEvent);
+		}
 	};
 
 };
