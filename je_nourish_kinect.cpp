@@ -17,8 +17,7 @@ namespace KinectOsvr {
 
 				if (KinectV1Device::Detect(&pNuiSensor)) {
 					m_found = true;
-					osvr::pluginkit::registerObjectForDeletion(
-						ctx, new KinectV1Device(ctx, pNuiSensor));
+					osvr::pluginkit::registerObjectForDeletion(ctx, new KinectV1Device(ctx, pNuiSensor));
 				}
 			}
 			return OSVR_RETURN_SUCCESS;

@@ -6,9 +6,6 @@
 #include <osvr/PluginKit/ButtonInterfaceC.h>
 #include <osvr/Util/EigenInterop.h>
 
-#include <Kinect.h>
-#include <NuiApi.h>
-
 #include <thread>
 #include <mutex>
 #include <map>

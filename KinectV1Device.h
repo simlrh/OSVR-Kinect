@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <NuiApi.h>
 
 namespace KinectOsvr {
 	class KinectV1Device {
@@ -19,6 +20,7 @@ namespace KinectOsvr {
 		void toggleSeatedMode();
 		BodyTrackingState *getBodyStates();
 		void setTrackedBody(int i);
+		void recenter();
 
 		struct ui_thread_data
 		{
